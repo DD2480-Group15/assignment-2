@@ -8,7 +8,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 @RestController
 public class Controllers {
     @PostMapping("/")
-    public String handleWebhook(@RequestBody JsonNode payload) {
+    //parameter will change to DTO once we have defined it
+    public String WebhookController(@RequestBody JsonNode payload) {
         try {
             String repo = payload.path("repository").path("name").asText();
             String branch = payload.path("ref").asText();
@@ -17,7 +18,7 @@ public class Controllers {
             System.out.println("Received build request for:");
             System.out.println("Repo: " + repo + " | Branch: " + branch + " | Commit: " + commit);
 
-            return "CI job started for " + commit;
+            return "CI job started for " + commit; // return 200 OK with message
         } catch (Exception e) {
             return "Error processing webhook: " + e.getMessage();
         }
