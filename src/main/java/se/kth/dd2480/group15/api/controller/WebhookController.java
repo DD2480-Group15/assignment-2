@@ -1,4 +1,4 @@
-package se.kth.dd2480.group15;
+package se.kth.dd2480.group15.api.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -6,10 +6,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import com.fasterxml.jackson.databind.JsonNode;
 
 @RestController
-public class Controllers {
+public class WebhookController {
     @PostMapping("/")
     //parameter will change to DTO once we have defined it
-    public String WebhookController(@RequestBody JsonNode payload) {
+    public String handleWebhook(@RequestBody JsonNode payload) {
         try {
             String repo = payload.path("repository").path("name").asText();
             String branch = payload.path("ref").asText();

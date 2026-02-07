@@ -1,4 +1,4 @@
-package se.kth.dd2480.group15;
+package se.kth.dd2480.group15.api.controller;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -6,12 +6,14 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import se.kth.dd2480.group15.api.controller.WebhookController;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(Controllers.class)
-class ControllersTest {
+@WebMvcTest(WebhookController.class)
+class WebhookControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
