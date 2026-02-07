@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 @RestController
 public class WebhookController {
-    @PostMapping("/")
+    @PostMapping("/webhook")
     //parameter will change to DTO once we have defined it
     public String handleWebhook(@RequestBody JsonNode payload) {
         try {

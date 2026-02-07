@@ -30,7 +30,7 @@ class WebhookControllerTest {
             }
             """;
 
-        mockMvc.perform(post("/")
+        mockMvc.perform(post("/webhook")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonPayload))
                 .andExpect(status().isOk())
