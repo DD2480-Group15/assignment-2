@@ -18,6 +18,19 @@ class WebhookControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    /**
+     * Verifies that {@code handleWebhook} returns {@code HTTP 200 OK} when the
+     * payload is correctly formatted and contains valid data. 
+     * This test simulates a typical webhook payload using mockMvc to send a POST request to the /webhook endpoint, 
+     * which ensures the controller can parse the JSON and respond appropriately.
+     * <p>
+     * Test setup: A JSON payload is created with a repository name, branch reference, and commit hash.
+     * The payload is sent as a POST request to the /webhook endpoint using mockMvc.
+     * 
+     * Expected outcome: The controller should return a 200 OK status with a message 
+     * indicating that the CI job has started for the given commit hash.
+     * </p>
+     */
     @Test
     void handleWebhook_returns200OK() throws Exception {
         String jsonPayload = """
@@ -37,6 +50,18 @@ class WebhookControllerTest {
                 .andExpect(content().string("CI job started for 1234567890abcdef"));
     }
 
+    /**
+     * Verifies that {@code handleWebhook} returns {@code HTTP 400 Bad Request} when the
+     * payload is incorrectly formatted. 
+     * This test simulates a malformed webhook payload using mockMvc to send a POST request to the /webhook endpoint, 
+     * which ensures the controller can handle invalid JSON and respond appropriately.
+     * <p>
+     * Test setup: A JSON payload is created with a repository name, branch reference, and commit hash.
+     * The payload is sent as a POST request to the /webhook endpoint using mockMvc.
+     * 
+     * Expected outcome: The controller should return a 400 Bad Request status.
+     * </p>
+     */
     @Test
     void handleWebhook_payloadWrongFormat_returnsBadRequest() throws Exception {
         String malformedJson = "this is not json";
