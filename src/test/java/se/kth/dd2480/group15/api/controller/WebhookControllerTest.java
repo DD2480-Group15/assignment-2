@@ -19,7 +19,7 @@ class WebhookControllerTest {
     private MockMvc mockMvc;
 
     @Test
-    void WebhookController_returns200OK() throws Exception {
+    void handleWebhook_returns200OK() throws Exception {
         String jsonPayload = """
             {
                 "ref": "refs/heads/main",
@@ -35,5 +35,15 @@ class WebhookControllerTest {
                 .content(jsonPayload))
                 .andExpect(status().isOk())
                 .andExpect(content().string("CI job started for 1234567890abcdef"));
+    }
+
+    @Test
+    void handleWebhook_payloadWrongFormat_returnsBadRequest() throws Exception {
+        String malformedJson = "this is not json";
+
+        mockMvc.perform(post("/webhook")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(malformedJson))
+                .andExpect(status().isBadRequest());
     }
 }
