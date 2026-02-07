@@ -1,6 +1,11 @@
 # assignment-2
 Continuous Integration
 
+## Configure Github Template
+- Commit Message Template
+```bash
+git config commit.template .gitmessage
+```
 
 ## Running and testing
 
