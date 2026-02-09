@@ -1,12 +1,18 @@
 package se.kth.dd2480.group15.api.dto.request;
 
-/*
+/**
  * DTO class to represent the structure of the JSON payload sent by GitHub for push events.
+ * <p>
+ * 
+ * @param after        the commit id of the pushed commit
+ * @param ref          the branch name of the pushed commit
+ * @param repository   the repository object of the pushed commit
  */
-public class PushRequestDTO {
-    private String after; //commit id
-    private String ref; // branch eg. "refs/heads/main 
-    private Repository repository; // nested object
+public record PushRequestDTO (
+        String after, //commit id
+        String ref, // branch eg. "refs/heads/main 
+        Repository repository // nested object
+) {
 
     /**
      * Handle the request from other functions to fetch the payload {@code after}, which is the commit id, sent by Github
@@ -36,11 +42,15 @@ public class PushRequestDTO {
 
     /**
      * Inner class to represent the structure of the repository object in the JSON payload sent by GitHub for push events.
+     * <p>
+     * 
+     * @param name         the repository name
+     * @param clone_url    the url to clone the repository
      */
-    public static class Repository {
-        private String name;
-        private String clone_url;
-
+    public static record Repository (
+        String name,
+        String clone_url
+    ) {
         /**
          * Handle the request from other functions to fetch the payload {@code name}, which is the repository name, sent by Github.
          * <p>
