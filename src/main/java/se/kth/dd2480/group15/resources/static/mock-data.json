@@ -1,0 +1,12 @@
+[
+{
+  "buildId": "1",
+  "commitSha":"af6d2c",
+  "owner": "Rasmus",
+  "branch": "feat/issueX/some-feature",
+  "status": "SUCCESS",
+  "createdAt": "2026-02-07-10:00:00",
+  "startedAt": "2026-02-07-10:00:05",
+  "finishedAt": "2026-02-07-10:00:10"
+}
+]
