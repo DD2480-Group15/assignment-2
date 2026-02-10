@@ -22,9 +22,10 @@ public class WebhookController {
             String repo = payload.getRepository().getName();
             String branch = payload.getRef();
             String commit = payload.getAfter();
+            String owner_name = payload.getRepository().getOwner().getName();
 
             System.out.println("Received build request for:");
-            System.out.println("Repo: " + repo + " | Branch: " + branch + " | Commit: " + commit);
+            System.out.println("Repo: " + repo + " | Branch: " + branch + " | Commit: " + commit + " | Owner's name: " + owner_name);
 
             return "CI job started for " + commit; // return 200 OK with message
         } catch (Exception e) {
