@@ -3,7 +3,7 @@ package se.kth.dd2480.group15.api.controller;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import com.fasterxml.jackson.databind.JsonNode;
+import se.kth.dd2480.group15.api.dto.request.PushRequestDTO;
 
 @RestController
 public class WebhookController {
@@ -13,16 +13,15 @@ public class WebhookController {
      * and fetch the payload content as JSON to extract the relevant information for the CI job.
      * <p>
      * 
-     * @param payload       the JSON payload sent by GitHub containing information about the event.
+     * @param payload       the JSON payload which is configured as PushRequestDTO sent by GitHub containing information about the event.
      * @return 200 OK with a message if the payload is processed successfully, otherwise returns an error message.
      */
     @PostMapping("/webhook")
-    public String handleWebhook(@RequestBody JsonNode payload) {
-        //parameter will change to DTO once we have defined it
+    public String handleWebhook(@RequestBody PushRequestDTO payload) {
         try {
-            String repo = payload.path("repository").path("name").asText();
-            String branch = payload.path("ref").asText();
-            String commit = payload.path("after").asText();
+            String repo = payload.getRepository().getName();
+            String branch = payload.getRef();
+            String commit = payload.getAfter();
 
             System.out.println("Received build request for:");
             System.out.println("Repo: " + repo + " | Branch: " + branch + " | Commit: " + commit);
