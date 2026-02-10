@@ -13,7 +13,20 @@ import java.util.Map;
  */
 @Service
 public class NotifierService {
-    private String token;
+    private final String token;
+    private final RestTemplate restTemplate;
+
+    /**
+     * Constructor of the service which will inject the rest template and the token needed before running.
+     * 
+     * @param restTemplate
+     */
+    public NotifierService(RestTemplate restTemplate) {
+        Dotenv dotenv = Dotenv.load();
+        this.restTemplate = restTemplate;
+        this.token = dotenv.get("GITHUB_TOKEN");
+    }
+
     
     /**
      * This method sends an authenticated POST request to the GitHub REST API:
@@ -30,12 +43,8 @@ public class NotifierService {
      * @return  true if success, false otherwise.
      */
     public boolean notify(String owner, String repo, String after, String state, String description) {
-        Dotenv dotenv = Dotenv.load();
-        token = dotenv.get("GITHUB_TOKEN");
 
         String url = "https://api.github.com/repos/" + owner + "/" + repo + "/statuses/" + after;
-
-        RestTemplate restTemplate = new RestTemplate();
 
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("state", state);
