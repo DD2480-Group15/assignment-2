@@ -19,6 +19,7 @@ public class Build {
     private final UUID buildId;
     private final String commitSha;
     private final String repoUrl;
+    private final String repoOwner;
     private final Instant createdAt;
     private Instant startedAt;
     private Instant finishedAt;
@@ -31,8 +32,8 @@ public class Build {
      * @param repoUrl the URL of the repository containing the code
      * @return a new Build instance in QUEUED status
      */
-    public static Build newBuild(String commitSha, String repoUrl) {
-        return new Build(UUID.randomUUID(), commitSha, repoUrl, Status.QUEUED, Instant.now(), null, null);
+    public static Build newBuild(String commitSha, String repoUrl, String repoOwner) {
+        return new Build(UUID.randomUUID(), commitSha, repoUrl, repoOwner, Status.QUEUED, Instant.now(), null, null);
     }
 
     /**
@@ -41,6 +42,7 @@ public class Build {
      * @param buildId the existing UUID of the build
      * @param commitSha the commit identifier
      * @param repoUrl the repository URL
+     * @param repoOwner the owner of the repository
      * @param status the current status of the build
      * @param createdAt timestamp of when the build was first created
      * @param startedAt timestamp of when the build started, or null if not started
@@ -51,17 +53,19 @@ public class Build {
             UUID buildId,
             String commitSha,
             String repoUrl,
+            String repoOwner,
             Status status,
             Instant createdAt,
             Instant startedAt,
             Instant finishedAt) {
-        return new Build(buildId, commitSha, repoUrl, status, createdAt, startedAt, finishedAt);
+        return new Build(buildId, commitSha, repoUrl, repoOwner, status, createdAt, startedAt, finishedAt);
     }
 
     private Build(
             UUID buildId,
             String commitSha,
             String repoUrl,
+            String repoOwner,
             Status status,
             Instant createdAt,
             Instant startedAt,
@@ -69,6 +73,7 @@ public class Build {
         this.buildId = buildId;
         this.commitSha = commitSha;
         this.repoUrl = repoUrl;
+        this.repoOwner = repoOwner;
         this.status = status;
         this.createdAt = createdAt;
         this.startedAt = startedAt;
@@ -83,6 +88,9 @@ public class Build {
 
     /** @return the URL of the repository */
     public String getRepoUrl() { return repoUrl; }
+
+    /** @return the owner of the repository */
+    public String getRepoOwner() { return repoOwner; }
 
     /** @return the current status of the build */
     public Status getStatus() { return status; }
