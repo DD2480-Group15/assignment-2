@@ -12,6 +12,7 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import se.kth.dd2480.group15.domain.Build;
 import se.kth.dd2480.group15.domain.BuildSummary;
+import se.kth.dd2480.group15.domain.LogFile;
 import se.kth.dd2480.group15.infrastructure.entity.BuildMetaFile;
 
 import java.io.IOException;
@@ -111,5 +112,89 @@ class FileBuildRepositoryTest {
         String actualLogString = log.get(log.size() - 1);
         assertTrue(success);
         assertEquals(chunk, actualLogString);
+    }
+
+    /**
+     * Verifies that when saving a new build, calling listAll returns a list where
+     * the build summary of the saved build is the last entry.
+     * <p>
+     * Test setup:
+     * - A new build is created.
+     * - The build is saved to the repository using the {@code save} method.
+     * - listAll is invoked, and the last entry is verified to match the expected build summary.
+     */
+    @Test
+    void listAll_afterSavingBuild_returnsBuildSummary() {
+        Build build = Build.newBuild("abc123", "url", "this", "name456");
+        UUID buildId = build.getBuildId();
+
+        repo.save(build);
+
+        List<BuildSummary> builds = repo.listAll();
+        assertFalse(builds.isEmpty());
+
+        BuildSummary lastEntry = builds.get(builds.size() - 1);
+        BuildSummary expectedSummary = new BuildSummary(
+                buildId,
+                build.getCommitSha(),
+                build.getCreatedAt()
+        );
+
+        assertEquals(expectedSummary, lastEntry);
+    }
+
+    /**
+     * Tests the functionality of the {@code findById} method in the {@code repo} repository class.
+     * Verifies that a build that has been saved can be correctly retrieved using its unique identifier.
+     * <p>
+     * Test setup:
+     * - A new build is created.
+     * - The build is saved to the repository using the {@code save} method.
+     * - The build is retrieved by its unique identifier using the {@code findById} method.
+     */
+    @Test
+    void findById_whenBuildExists_returnsBuild() {
+        Build build = Build.newBuild("abc123", "url", "this", "name456");
+        UUID buildId = build.getBuildId();
+
+        repo.save(build);
+
+        // Retrieve the build by ID
+        Build retrievedBuild = repo.findById(buildId).orElseThrow();
+
+        // Verify the retrieved build matches the original
+        assertEquals(buildId, retrievedBuild.getBuildId());
+        assertEquals(build.getCommitSha(), retrievedBuild.getCommitSha());
+        assertEquals(build.getRepoUrl(), retrievedBuild.getRepoUrl());
+        assertEquals(build.getRepoOwner(), retrievedBuild.getRepoOwner());
+        assertEquals(build.getRepoName(), retrievedBuild.getRepoName());
+        assertEquals(build.getCreatedAt(), retrievedBuild.getCreatedAt());
+    }
+
+    /**
+     * Verifies that after appending a log entry to a build's log file, the log
+     * entry is correctly stored and can then be retrieved.
+     * <p>
+     * Test setup:
+     * - A new build is created.
+     * - The build is saved to the repository.
+     * - A log chunk is appended to the build's log file.
+     * - The log can be retrieved and contains the stored log chunk.
+     */
+    @Test
+    void getLog_afterAppendingLog_returnsLogContainingChunk() {
+        Build build = Build.newBuild("abc123", "url", "this", "name456");
+        UUID buildId = build.getBuildId();
+        String logChunk = "Test log entry";
+
+        // Save the build and append a log chunk
+        repo.save(build);
+        boolean appendSuccess = repo.appendToLog(buildId, logChunk);
+
+        // Verify the log content
+        assertTrue(appendSuccess);
+        LogFile logFile = repo.getLog(buildId).orElseThrow();
+        assertNotNull(logFile);
+        assertTrue(logFile.content().contains(logChunk));
     }
 }
