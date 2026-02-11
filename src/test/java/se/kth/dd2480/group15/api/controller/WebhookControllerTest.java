@@ -38,7 +38,10 @@ class WebhookControllerTest {
                 "ref": "refs/heads/main",
                 "after": "1234567890abcdef",
                 "repository": {
-                    "name": "assignment-2"
+                    "name": "assignment-2",
+                    "owner": {
+                        "name": "Selinaliu1030"
+                    }
                 }
             }
             """;

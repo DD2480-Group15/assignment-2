@@ -12,21 +12,23 @@ class BuildTest {
     /**
      * Verifies that newBuild initializes a build with the correct default values
      * 
-     * Input: A specific commit SHA and repository URL
+     * Input: A specific commit SHA, repository URL and owner
      * Expected outcome: Status is QUEUED, timestamps are initialized correctly 
-     * and the provided SHA and URL should be stored
+     * and the provided SHA, URL and owner should be stored
      * 
      */
     @Test
     void newBuildShouldHaveCorrectDefaults() {
         String sha = "testtest123";
         String url = "https://github.com/user/repo";
+        String owner = "owner1";
         
-        Build build = Build.newBuild(sha, url);
+        Build build = Build.newBuild(sha, url, owner);
 
         assertNotNull(build.getBuildId());
         assertEquals(sha, build.getCommitSha());
         assertEquals(url, build.getRepoUrl());
+        assertEquals(owner, build.getRepoOwner());
         assertEquals(Build.Status.QUEUED, build.getStatus());
         assertNotNull(build.getCreatedAt());
     }
@@ -41,7 +43,7 @@ class BuildTest {
      */
     @Test
     void startBuildShouldUpdateStatusAndTimestamp() {
-        Build build = Build.newBuild("sha", "url");
+        Build build = Build.newBuild("sha", "url", "owner");
         build.startBuild();
         
         assertEquals(Build.Status.RUNNING, build.getStatus());
@@ -58,7 +60,7 @@ class BuildTest {
      */
     @Test
     void finishBuildShouldSetSuccessStatus() {
-        Build build = Build.newBuild("sha", "url");
+        Build build = Build.newBuild("sha", "url", "owner");
         build.startBuild();
         build.finishBuild();
         
@@ -76,7 +78,7 @@ class BuildTest {
      */
     @Test
     void failBuildShouldSetFailedStatus() {
-        Build build = Build.newBuild("sha", "url");
+        Build build = Build.newBuild("sha", "url", "owner");
         build.startBuild();
         build.failBuild();
         

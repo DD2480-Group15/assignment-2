@@ -1,4 +1,3 @@
-
 # Compiled class file
 *.class
 
@@ -33,5 +32,7 @@ target
 # Mac directory
 .DS_Store
 
-# workspace
+#other
 workspace/
+.vscode/
+.env

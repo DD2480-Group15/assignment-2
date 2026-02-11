@@ -46,10 +46,12 @@ public record PushRequestDTO (
      * 
      * @param name         the repository name
      * @param clone_url    the url to clone the repository
+     * @param owner        the Owner object which contains information about the owner of the repo
      */
     public static record Repository (
         String name,
-        String clone_url
+        String clone_url,
+        Owner owner
     ) {
         /**
          * Handle the request from other functions to fetch the payload {@code name}, which is the repository name, sent by Github.
@@ -66,5 +68,25 @@ public record PushRequestDTO (
          * @return the clone url under the repository object
          */
         public String getClone_url() { return clone_url; }
+
+        /**
+         * Handle the request from other functions to fetch the owner object, which contains information about the owner of the repo.
+         * <p>
+         * 
+         * @return the owner object
+         */
+        public Owner getOwner() {return owner;}
+    }
+
+    /**
+     * Inner class to represent the structure of the owner object
+     * <p>
+     * 
+     * @param name         the repository name
+     */
+    public static record Owner (
+        String name
+    ) {
+        public String getName() { return name; }
     }
 }
