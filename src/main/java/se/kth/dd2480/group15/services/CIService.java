@@ -9,6 +9,7 @@ import jakarta.annotation.PreDestroy;
 
 import se.kth.dd2480.group15.api.dto.request.PushRequestDTO;
 import se.kth.dd2480.group15.domain.Build;
+import se.kth.dd2480.group15.infrastructure.persistence.BuildRepository;
 
 @Service
 public class CIService {
@@ -20,10 +21,29 @@ public class CIService {
     private Thread thread;
 
 
-    public CIService() { }
+    /** Repository used for persisting build logs and metadata. */
+    private final BuildRepository buildRepository;
 
+    public CIService(BuildRepository buildRepository) {
+        this.buildRepository = buildRepository;
+    }
 
-    public void queueJob(PushRequestDTO job) { }
+    /**
+     * Converts an incoming push request into a {@link Build} and adds it
+     * to the processing queue.
+     *
+     * @param job the incoming push request containing repository and commit information
+     */
+    public void queueJob(PushRequestDTO job) {
+        Build build = Build.newBuild(
+            job.after(), 
+            job.getRepository().clone_url(), 
+            job.getRepository().getOwner().getName()
+        );
+        queue.offer(build);
+
+        buildRepository.save(build);
+    }
 
     public void handleJob(Build job) { }
 
