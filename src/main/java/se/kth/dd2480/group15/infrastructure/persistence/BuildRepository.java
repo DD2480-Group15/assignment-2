@@ -1,7 +1,7 @@
 package se.kth.dd2480.group15.infrastructure.persistence;
 
 import se.kth.dd2480.group15.domain.Build;
-import se.kth.dd2480.group15.infrastructure.entity.LogSlice;
+import se.kth.dd2480.group15.domain.LogFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -57,14 +57,11 @@ public interface BuildRepository {
     Optional<Build> findById(UUID buildId);
 
     /**
-     * Retrieves a portion of the log associated with the specified build, starting from
-     * the given offset. This method reads a segment of the log and provides the content
-     * along with the next offset indicating where to begin reading the next segment.
+     * Retrieves the log associated with the specified build.
      *
      * @param buildId the unique identifier for the build whose log is being retrieved
-     * @param offset  the position within the content file to start reading from
-     * @return an {@link Optional} containing a {@link LogSlice} object if the log exists,
+     * @return an {@link Optional} containing a {@link LogFile} object if the log exists,
      *         or an empty Optional if no log exists for the given build id.
      */
-    Optional<LogSlice> getLog(UUID buildId, long offset);
+    Optional<LogFile> getLog(UUID buildId);
 }

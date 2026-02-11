@@ -10,7 +10,7 @@ import se.kth.dd2480.group15.domain.Build;
 import se.kth.dd2480.group15.infrastructure.config.StorageProperties;
 import se.kth.dd2480.group15.infrastructure.entity.BuildIndexEntry;
 import se.kth.dd2480.group15.infrastructure.entity.BuildMetaFile;
-import se.kth.dd2480.group15.infrastructure.entity.LogSlice;
+import se.kth.dd2480.group15.domain.LogFile;
 
 import java.io.IOException;
 import java.nio.file.*;
@@ -183,7 +183,7 @@ public class FileBuildRepository implements BuildRepository {
     }
 
     @Override
-    public Optional<LogSlice> getLog(UUID buildId, long offset) {
+    public Optional<LogFile> getLog(UUID buildId) {
         return Optional.empty();
     }
 }
