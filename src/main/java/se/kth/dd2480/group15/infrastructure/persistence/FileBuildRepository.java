@@ -182,7 +182,7 @@ public class FileBuildRepository implements BuildRepository {
         }
 
         Path logPath = buildDir.resolve(LOG_FILE_NAME);
-        appendToFile(logPath, chunk);
+        appendLineToFile(logPath, chunk);
         return true;
     }
 
