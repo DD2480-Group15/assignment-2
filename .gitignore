@@ -32,4 +32,7 @@ target
 # Mac directory
 .DS_Store
 
+#other
+workspace/
+.vscode/
 .env
