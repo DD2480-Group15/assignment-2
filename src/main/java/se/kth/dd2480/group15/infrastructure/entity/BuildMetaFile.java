@@ -12,6 +12,7 @@ import java.util.UUID;
  * @param commitSha the commit hash associated with the build
  * @param repoUrl the URL of the repository containing the code
  * @param repoOwner the owner of the repository
+ * @param repoName the name of the repository
  * @param status the current status of the build
  * @param createdAt the timestamp when the build was created
  * @param startedAt the timestamp when the build started, or null if not started
@@ -22,6 +23,7 @@ public record BuildMetaFile(
         String commitSha,
         String repoUrl,
         String repoOwner,
+        String repoName,
         Build.Status status,
         Instant createdAt,
         Instant startedAt,
@@ -39,6 +41,7 @@ public record BuildMetaFile(
                 b.getCommitSha(),
                 b.getRepoUrl(),
                 b.getRepoOwner(),
+                b.getRepoName(),
                 b.getStatus(),
                 b.getCreatedAt(),
                 b.getStartedAt(),
@@ -53,7 +56,7 @@ public record BuildMetaFile(
      */
     public Build toDomain() {
         return Build.rehydrate(
-                buildId, commitSha, repoUrl, repoOwner,
+                buildId, commitSha, repoUrl, repoOwner, repoName,
                 status, createdAt, startedAt, finishedAt
         );
     }

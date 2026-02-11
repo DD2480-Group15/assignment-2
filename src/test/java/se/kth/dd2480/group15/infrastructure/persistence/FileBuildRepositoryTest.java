@@ -47,14 +47,14 @@ class FileBuildRepositoryTest {
      * to the index file for the build.
      * <p>
      * Test setup:
-     * - A new build is created with a commit SHA, repository URL, and repository owner.
+     * - A new build is created with a commit SHA, repository URL, repository owner, and repository name.
      * - The created build is stored using the save method of the repository class.
      *
      * @throws IOException if any file operations fail during the test
      */
     @Test
     void save_newBuild_createsDirectoriesAndIndexEntry() throws IOException {
-        Build build = Build.newBuild("abc123", "url", "this");
+        Build build = Build.newBuild("abc123", "url", "this", "name456");
         UUID buildId = build.getBuildId();
 
         repo.save(build);
@@ -89,7 +89,7 @@ class FileBuildRepositoryTest {
      * is created/exists, and the log chunk is written to the log file.
      * <p>
      * Test setup:
-     * - A new build is created with a specific commit SHA, repository URL, and owner.
+     * - A new build is created with a specific commit SHA, repository URL, repository owner, and repository name.
      * - The build is saved to storage.
      * - A log chunk is appended to the build's log file using the repository's appendToLog method.
      *
@@ -97,7 +97,7 @@ class FileBuildRepositoryTest {
      */
     @Test
     void appendToLog_addLogChunk_chunkIsAppendedToFile() throws IOException {
-        Build build = Build.newBuild("abc123", "url", "this");
+        Build build = Build.newBuild("abc123", "url", "this", "name456");
         UUID buildId = build.getBuildId();
         String chunk = "chunk";
 

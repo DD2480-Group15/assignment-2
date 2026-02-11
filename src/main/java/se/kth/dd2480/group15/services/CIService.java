@@ -62,7 +62,8 @@ public class CIService {
         Build build = Build.newBuild(
             job.after(), 
             job.getRepository().clone_url(), 
-            job.getRepository().getOwner().getName()
+            job.getRepository().getOwner().getName(),
+            job.getRepository().getName()
         );
         queue.offer(build);
 
@@ -113,7 +114,7 @@ public class CIService {
 
         // Call Notifier
         String state = success ? "success" : "fail", description = sb.toString();
-        notifierService.notify(job.getRepoOwner(), job.getRepoUrl(), job.getCommitSha(), state, description);
+        notifierService.notify(job.getRepoOwner(), job.getRepoName(), job.getCommitSha(), state, description);
     }
 
     /**

@@ -106,7 +106,7 @@ class CIServiceTest {
         when(processRunner.cloneRepo(eq(job), any())).thenReturn(true);
         when(processRunner.build(eq(job), any())).thenReturn(true);
         when(processRunner.test(eq(job), any())).thenReturn(true);
-        when(job.getRepoUrl()).thenReturn("url123");
+        when(job.getRepoName()).thenReturn("name123");
         when(job.getCommitSha()).thenReturn("commit456");
         when(job.getRepoOwner()).thenReturn("owner789");
 
@@ -126,7 +126,7 @@ class CIServiceTest {
         // Verify notifier called
         verify(notifierService).notify(
             job.getRepoOwner(),
-            job.getRepoUrl(),
+            job.getRepoName(),
             job.getCommitSha(),
             "success",
             "Clone: Success\nBuild: Success\nTest: Success"
@@ -149,7 +149,7 @@ class CIServiceTest {
         Build job = mock(Build.class);
 
         when(processRunner.cloneRepo(eq(job), any())).thenReturn(false);
-        when(job.getRepoUrl()).thenReturn("url123");
+        when(job.getRepoName()).thenReturn("name123");
         when(job.getCommitSha()).thenReturn("commit456");
         when(job.getRepoOwner()).thenReturn("owner789");
 
@@ -170,7 +170,7 @@ class CIServiceTest {
         // Verify notifier called
         verify(notifierService).notify(
                 job.getRepoOwner(),
-                job.getRepoUrl(),
+                job.getRepoName(),
                 job.getCommitSha(),
                 "fail",
                 "Clone: Fail"
@@ -194,7 +194,7 @@ class CIServiceTest {
 
         when(processRunner.cloneRepo(eq(job), any())).thenReturn(true);
         when(processRunner.build(eq(job), any())).thenReturn(false);
-        when(job.getRepoUrl()).thenReturn("url123");
+        when(job.getRepoName()).thenReturn("name123");
         when(job.getCommitSha()).thenReturn("commit456");
         when(job.getRepoOwner()).thenReturn("owner789");
 
@@ -214,7 +214,7 @@ class CIServiceTest {
         // Verify notifier called
         verify(notifierService).notify(
                 job.getRepoOwner(),
-                job.getRepoUrl(),
+                job.getRepoName(),
                 job.getCommitSha(),
                 "fail",
                 "Clone: Success\nBuild: Fail"
@@ -238,7 +238,7 @@ class CIServiceTest {
         when(processRunner.cloneRepo(eq(job), any())).thenReturn(true);
         when(processRunner.build(eq(job), any())).thenReturn(true);
         when(processRunner.test(eq(job), any())).thenReturn(false);
-        when(job.getRepoUrl()).thenReturn("url123");
+        when(job.getRepoName()).thenReturn("name123");
         when(job.getCommitSha()).thenReturn("commit456");
         when(job.getRepoOwner()).thenReturn("owner789");
 
@@ -258,7 +258,7 @@ class CIServiceTest {
         // Verify notifier called
         verify(notifierService).notify(
                 job.getRepoOwner(),
-                job.getRepoUrl(),
+                job.getRepoName(),
                 job.getCommitSha(),
                 "fail",
                 "Clone: Success\nBuild: Success\nTest: Fail"
