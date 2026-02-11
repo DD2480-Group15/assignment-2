@@ -172,7 +172,7 @@ class CIServiceTest {
                 job.getRepoOwner(),
                 job.getRepoName(),
                 job.getCommitSha(),
-                "fail",
+                "failure",
                 "Clone: Fail"
         );
     }
@@ -216,7 +216,7 @@ class CIServiceTest {
                 job.getRepoOwner(),
                 job.getRepoName(),
                 job.getCommitSha(),
-                "fail",
+                "failure",
                 "Clone: Success\nBuild: Fail"
         );
     }
@@ -260,7 +260,7 @@ class CIServiceTest {
                 job.getRepoOwner(),
                 job.getRepoName(),
                 job.getCommitSha(),
-                "fail",
+                "failure",
                 "Clone: Success\nBuild: Success\nTest: Fail"
         );
     }

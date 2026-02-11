@@ -113,7 +113,7 @@ public class CIService {
         buildRepository.save(job);
 
         // Call Notifier
-        String state = success ? "success" : "fail", description = sb.toString();
+        String state = success ? "success" : "failure", description = sb.toString();
         notifierService.notify(job.getRepoOwner(), job.getRepoName(), job.getCommitSha(), state, description);
     }
 
