@@ -3,13 +3,9 @@ import java.util.List;
 
 /**
  * DTO providing a list of build objects {"builds": [...]}
+ * 
+ * @param builds    the list of build metadata objects
  */
-public class BuildListResponse {
-    public List<BuildMetaResponse> builds;
-
-    public BuildListResponse() {} // for Jackson to deserialize JSON
-
-    public BuildListResponse(List<BuildMetaResponse> builds) {
-        this.builds = builds;
-    }
-}
+public record BuildListResponse(
+    List<BuildMetaResponse> builds
+) {}
