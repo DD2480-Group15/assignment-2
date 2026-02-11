@@ -29,8 +29,10 @@ public interface BuildRepository {
      *
      * @param buildId the unique identifier for the build whose log is being updated
      * @param chunk the log-chunk that will be appended to the build's log
+     * @return {@code true} if the log chunk was successfully appended; {@code false} if
+     *         the build directory does not exist
      */
-    void appendToLog(UUID buildId, String chunk);
+    boolean appendToLog(UUID buildId, String chunk);
 
     /**
      * Retrieves a list of at most {@code limit} builds, starting from the specified
@@ -49,7 +51,8 @@ public interface BuildRepository {
      * Retrieves the build associated with the specified build id.
      *
      * @param buildId the unique identifier of the build whose metadata is to be retrieved
-     * @return a {@link Build} object containing the metadata for the specified buildId
+     * @return an {@link Optional} containing the {@link Build} entity if found, or an
+     *         empty Optional if no build exists with the given id
      */
     Optional<Build> findById(UUID buildId);
 
@@ -60,8 +63,8 @@ public interface BuildRepository {
      *
      * @param buildId the unique identifier for the build whose log is being retrieved
      * @param offset  the position within the content file to start reading from
-     * @return a {@link LogSlice} object containing the extracted log content and the
-     *                            offset for the next log segment
+     * @return an {@link Optional} containing a {@link LogSlice} object if the log exists,
+     *         or an empty Optional if no log exists for the given build id.
      */
-    LogSlice getLog(UUID buildId, long offset);
+    Optional<LogSlice> getLog(UUID buildId, long offset);
 }
