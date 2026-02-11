@@ -1,5 +1,7 @@
 package se.kth.dd2480.group15.services;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -12,10 +14,28 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import se.kth.dd2480.group15.api.dto.request.PushRequestDTO;
+import se.kth.dd2480.group15.application.services.NotifierService;
 import se.kth.dd2480.group15.domain.Build;
 import se.kth.dd2480.group15.infrastructure.persistence.BuildRepository;
 
+/**
+ * Unit tests for {@link CIService}
+ * 
+ * This test class verifies:
+ * - Correct queueing of build jobs
+ * - Correct execution flow for successful build jobs
+ * - Correct behavior when clone, build, or test steps fail
+ * - Proper interaction with {@link ProcessRunner} and {@link NotifierService}
+ * 
+ * All external dependencies are mocked using Mockito.
+ */
 class CIServiceTest {
+
+    @Mock
+    private ProcessRunner processRunner;
+
+    @Mock
+    private NotifierService notifierService;
 
     @Mock
     BuildRepository buildRepository;
@@ -69,9 +89,184 @@ class CIServiceTest {
         assertEquals("owner789", job.getRepoOwner());
     }
 
+    /**
+     * Verifies that {@link CIService#handleJob(Build)} behaves correctly for a
+     * successful job.
+     * 
+     * This test ensures:
+     * - Clone, build, and test executes in order when all succeed
+     * - The build is marked as finished
+     * - A success notification is sent
+     * - Cleanup is performed
+     */
+    @Test
+    void testHandleJobSuccess() {
+        Build job = mock(Build.class);
+
+        when(processRunner.cloneRepo(eq(job), any())).thenReturn(true);
+        when(processRunner.build(eq(job), any())).thenReturn(true);
+        when(processRunner.test(eq(job), any())).thenReturn(true);
+        when(job.getRepoUrl()).thenReturn("url123");
+        when(job.getCommitSha()).thenReturn("commit456");
+        when(job.getRepoOwner()).thenReturn("owner789");
+
+
+        ciService.handleJob(job);
+
+        // Verify processService calls
+        verify(processRunner).cloneRepo(eq(job), any());
+        verify(processRunner).build(eq(job), any());
+        verify(processRunner).test(eq(job), any());
+        verify(processRunner).cleanup(job);
+
+        // Verify build finished
+        verify(job).finishBuild();
+        verify(job, never()).failBuild();
+
+        // Verify notifier called
+        verify(notifierService).notify(
+            job.getRepoOwner(),
+            job.getRepoUrl(),
+            job.getCommitSha(),
+            "success",
+            "Clone: Success\nBuild: Success\nTest: Success"
+        );
+    }
 
     /**
-     * Helper method used to access the private queue field in {@link XXCIService}
+     * Verifies that {@link CIService#handleJob(Build)} behaves correctly when
+     * the clone step fails.
+     * 
+     * This test ensures:
+     * - Clone step is executed
+     * - Build and test steps are NOT executed
+     * - The build is marked as failed
+     * - A failure notification is sent
+     * - Cleanup is still executed
+     */
+    @Test
+    void testHandleJobCloneFails() {
+        Build job = mock(Build.class);
+
+        when(processRunner.cloneRepo(eq(job), any())).thenReturn(false);
+        when(job.getRepoUrl()).thenReturn("url123");
+        when(job.getCommitSha()).thenReturn("commit456");
+        when(job.getRepoOwner()).thenReturn("owner789");
+
+
+        ciService.handleJob(job);
+
+        // Verify processService calls
+        verify(processRunner).cloneRepo(eq(job), any());
+        verify(processRunner, never()).build(eq(job), any());
+        verify(processRunner, never()).test(eq(job), any());
+
+        verify(processRunner).cleanup(job);
+
+        // Verify build fails
+        verify(job).failBuild();
+        verify(job, never()).finishBuild();
+
+        // Verify notifier called
+        verify(notifierService).notify(
+                job.getRepoOwner(),
+                job.getRepoUrl(),
+                job.getCommitSha(),
+                "fail",
+                "Clone: Fail"
+        );
+    }
+
+    /**
+     * Verifies that {@link CIService#handleJob(Build)} behaves correctly when
+     * the build step fails.
+     * 
+     * This test ensures:
+     * - Clone and build steps are executed
+     * - Test step is NOT executed
+     * - The build is marked as failed
+     * - A failure notification is sent
+     * - Cleanup is still executed
+     */
+    @Test
+    void testHandleJobBuildFails() {
+        Build job = mock(Build.class);
+
+        when(processRunner.cloneRepo(eq(job), any())).thenReturn(true);
+        when(processRunner.build(eq(job), any())).thenReturn(false);
+        when(job.getRepoUrl()).thenReturn("url123");
+        when(job.getCommitSha()).thenReturn("commit456");
+        when(job.getRepoOwner()).thenReturn("owner789");
+
+
+        ciService.handleJob(job);
+
+        // Verify processService calls
+        verify(processRunner).cloneRepo(eq(job), any());
+        verify(processRunner).build(eq(job), any());
+        verify(processRunner, never()).test(eq(job), any());
+        verify(processRunner).cleanup(job);
+
+        // Verify build fails
+        verify(job).failBuild();
+        verify(job, never()).finishBuild();
+
+        // Verify notifier called
+        verify(notifierService).notify(
+                job.getRepoOwner(),
+                job.getRepoUrl(),
+                job.getCommitSha(),
+                "fail",
+                "Clone: Success\nBuild: Fail"
+        );
+    }
+
+    /**
+     * Verifies that {@link CIService#handleJob(Build)} behaves correctly when
+     * the test step fails.
+     * 
+     * This test ensures:
+     * - Clone and build succeed
+     * - The build is marked as failed
+     * - A failure notification is sent
+     * - Cleanup is executed     
+     */
+    @Test
+    void testHandleJobTestFails() {
+        Build job = mock(Build.class);
+
+        when(processRunner.cloneRepo(eq(job), any())).thenReturn(true);
+        when(processRunner.build(eq(job), any())).thenReturn(true);
+        when(processRunner.test(eq(job), any())).thenReturn(false);
+        when(job.getRepoUrl()).thenReturn("url123");
+        when(job.getCommitSha()).thenReturn("commit456");
+        when(job.getRepoOwner()).thenReturn("owner789");
+
+        ciService.handleJob(job);
+
+
+        // Verify processService calls
+        verify(processRunner).cloneRepo(eq(job), any());
+        verify(processRunner).build(eq(job), any());
+        verify(processRunner).test(eq(job), any());
+        verify(processRunner).cleanup(job);
+
+        // Verify build fails
+        verify(job).failBuild();
+        verify(job, never()).finishBuild();
+
+        // Verify notifier called
+        verify(notifierService).notify(
+                job.getRepoOwner(),
+                job.getRepoUrl(),
+                job.getCommitSha(),
+                "fail",
+                "Clone: Success\nBuild: Success\nTest: Fail"
+        );
+    }
+
+    /**
+     * Helper method used to access the private queue field in {@link CIService}
      * via reflection.
      * 
      * @param service the CIService instance

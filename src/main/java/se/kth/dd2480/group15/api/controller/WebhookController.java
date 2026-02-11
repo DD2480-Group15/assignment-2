@@ -4,9 +4,16 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import se.kth.dd2480.group15.api.dto.request.PushRequestDTO;
+import se.kth.dd2480.group15.services.CIService;
 
 @RestController
 public class WebhookController {
+
+    private final CIService ciService;
+
+    public WebhookController(CIService ciService) {
+        this.ciService = ciService;
+    }
 
     /**
      * Handle the webhook POST response from GitHub when push event is triggered 
@@ -26,6 +33,9 @@ public class WebhookController {
 
             System.out.println("Received build request for:");
             System.out.println("Repo: " + repo + " | Branch: " + branch + " | Commit: " + commit + " | Owner's name: " + owner_name);
+
+            //queue job
+            ciService.queueJob(payload);
 
             return "CI job started for " + commit; // return 200 OK with message
         } catch (Exception e) {
