@@ -56,7 +56,9 @@ public class FileBuildRepository implements BuildRepository {
 
         try {
             Files.createDirectories(buildRoot); // Creates ~/dd2480-ci/builds if it doesn't already exist
-            Files.createFile(indexFile);
+            if (!Files.exists(indexFile)) {
+                Files.createFile(indexFile);
+            }
         } catch (IOException e) {
             throw new RuntimeException("Failed to create builds path directory: " + buildRoot, e);
         }
