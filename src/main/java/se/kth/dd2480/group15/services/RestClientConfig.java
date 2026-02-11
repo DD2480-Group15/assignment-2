@@ -1,4 +1,4 @@
-package se.kth.dd2480.group15.application.services;
+package se.kth.dd2480.group15.services;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

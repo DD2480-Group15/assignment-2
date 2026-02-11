@@ -14,7 +14,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import se.kth.dd2480.group15.api.dto.request.PushRequestDTO;
-import se.kth.dd2480.group15.application.services.NotifierService;
 import se.kth.dd2480.group15.domain.Build;
 import se.kth.dd2480.group15.infrastructure.persistence.BuildRepository;
 
