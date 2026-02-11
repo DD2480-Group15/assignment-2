@@ -182,7 +182,7 @@ public class FileBuildRepository implements BuildRepository {
         }
 
         Path logPath = buildDir.resolve(LOG_FILE_NAME);
-        appendToFile(logPath, chunk);
+        appendLineToFile(logPath, chunk);
         return true;
     }
 
@@ -275,7 +275,7 @@ public class FileBuildRepository implements BuildRepository {
             StringBuilder sb = new StringBuilder();
             String line;
             while ((line = reader.readLine()) != null) {
-                sb.append(line);
+                sb.append(line).append("\n");
             }
             return Optional.of(new LogFile(sb.toString()));
         } catch (IOException e) {

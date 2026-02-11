@@ -26,7 +26,7 @@ async function loadBuildDetails(){
         document.getElementById('build-commit').innerText = meta.commitSha;
         document.getElementById('build-owner').innerText = meta.owner;
         document.getElementById('build-date').innerText = meta.createdAt;
-        document.getElementById('log-output').innerText = logBody.log;
+        document.getElementById('log-output').innerText = logBody.logContent;
     }
 }
 
