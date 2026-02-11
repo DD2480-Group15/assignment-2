@@ -1,7 +1,8 @@
 package se.kth.dd2480.group15.infrastructure.persistence;
 
 import se.kth.dd2480.group15.domain.Build;
-import se.kth.dd2480.group15.infrastructure.entity.LogSlice;
+import se.kth.dd2480.group15.domain.BuildSummary;
+import se.kth.dd2480.group15.domain.LogFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -10,7 +11,7 @@ import java.util.UUID;
 /**
  * Represents a repository for managing Build entities and their associated data.
  * This interface provides methods for persisting build metadata, handling build logs,
- * and retrieving information about builds stored in the system.
+ * and retrieving build information stored in the system.
  */
 public interface BuildRepository {
 
@@ -35,17 +36,13 @@ public interface BuildRepository {
     boolean appendToLog(UUID buildId, String chunk);
 
     /**
-     * Retrieves a list of at most {@code limit} builds, starting from the specified
-     * offset in relation to the most recent build.
+     * Retrieves a list of all build instances.
      * <p>
-     * Builds are ordered by creation time descending (most recent first).
+     * Builds are ordered by creation date (oldest first).
      *
-     * @param limit  maximum number of builds to return
-     * @param offset specifies the index of the first build to return, where
-     *               {@code offset = 0} refers to the most recent build
-     * @return a list of {@link Build} objects representing a slice of the stored builds
+     * @return a list of {@link Build} objects representing all build instances
      */
-    List<Build> list(int limit, int offset);
+    List<BuildSummary> listAll();
 
     /**
      * Retrieves the build associated with the specified build id.
@@ -57,14 +54,11 @@ public interface BuildRepository {
     Optional<Build> findById(UUID buildId);
 
     /**
-     * Retrieves a portion of the log associated with the specified build, starting from
-     * the given offset. This method reads a segment of the log and provides the content
-     * along with the next offset indicating where to begin reading the next segment.
+     * Retrieves the log associated with the specified build.
      *
      * @param buildId the unique identifier for the build whose log is being retrieved
-     * @param offset  the position within the content file to start reading from
-     * @return an {@link Optional} containing a {@link LogSlice} object if the log exists,
+     * @return an {@link Optional} containing a {@link LogFile} object if the log exists,
      *         or an empty Optional if no log exists for the given build id.
      */
-    Optional<LogSlice> getLog(UUID buildId, long offset);
+    Optional<LogFile> getLog(UUID buildId);
 }

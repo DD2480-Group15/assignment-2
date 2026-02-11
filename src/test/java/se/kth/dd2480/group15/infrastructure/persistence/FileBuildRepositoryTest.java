@@ -11,7 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import se.kth.dd2480.group15.domain.Build;
-import se.kth.dd2480.group15.infrastructure.entity.BuildIndexEntry;
+import se.kth.dd2480.group15.domain.BuildSummary;
 import se.kth.dd2480.group15.infrastructure.entity.BuildMetaFile;
 
 import java.io.IOException;
@@ -74,13 +74,13 @@ class FileBuildRepositoryTest {
         Path indexPath = tempDir.resolve(FileBuildRepository.INDEX_FILE_NAME);
         assertTrue(Files.exists(indexPath));
         List<String> builds = Files.readAllLines(indexPath);
-        BuildIndexEntry expectedIndexEntry = new BuildIndexEntry(
+        BuildSummary expectedIndexEntry = new BuildSummary(
                 buildId,
                 build.getCommitSha(),
                 build.getCreatedAt());
-        BuildIndexEntry actualIndexEntry = MAPPER.readValue(
+        BuildSummary actualIndexEntry = MAPPER.readValue(
                 builds.get(builds.size() - 1),
-                BuildIndexEntry.class);
+                BuildSummary.class);
         assertEquals(expectedIndexEntry, actualIndexEntry);
     }
 
