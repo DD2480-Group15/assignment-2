@@ -1,4 +1,4 @@
-package se.kth.dd2480.group15.model;
+package se.kth.dd2480.group15.services;
 
 import org.springframework.stereotype.Service;
 import se.kth.dd2480.group15.domain.Build;

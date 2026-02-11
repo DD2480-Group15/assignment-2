@@ -1,4 +1,4 @@
-package se.kth.dd2480.group15.model;
+package se.kth.dd2480.group15.services;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,8 @@ class ProcessRunnerTest {
         // Creates a valid build object for the tests
         testJob = Build.newBuild(
             "7fd1a60b01f91b314f59955a4e4d4c80d8df11d3",       // real
-            "https://github.com/octocat/Hello-World"            // real
+            "https://github.com/octocat/Hello-World",           // real
+            "octocat"                                         // real
         );
     }
 
@@ -37,7 +38,7 @@ class ProcessRunnerTest {
         List<String> logs = new ArrayList<>();
         
         // Create a build with a URL that does not exist
-        Build invalidJob = Build.newBuild("commit-sha", "www.invalid-url.here");
+        Build invalidJob = Build.newBuild("commit-sha", "www.invalid-url.here", "owner");
 
         // Try to clone the invalid repo
         boolean result = runner.cloneRepo(invalidJob, line -> logs.add(line));
@@ -58,7 +59,7 @@ class ProcessRunnerTest {
         
         // We use a real repo (githubs hello-world-repo) 
         // but a invalid commit-SHA to trigger a specific git behavior
-        Build invalidShaJob = Build.newBuild("invalid-sha", "https://github.com/octocat/Hello-World");
+        Build invalidShaJob = Build.newBuild("invalid-sha", "https://github.com/octocat/Hello-World", "octocat");
 
         runner.cloneRepo(invalidShaJob, line -> logs.add(line));
 
