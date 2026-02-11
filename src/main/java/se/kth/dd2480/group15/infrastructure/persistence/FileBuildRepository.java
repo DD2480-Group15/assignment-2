@@ -17,6 +17,7 @@ import java.nio.file.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * FileBuildRepository is a file-based implementation of the {@link BuildRepository}
@@ -33,6 +34,8 @@ public class FileBuildRepository implements BuildRepository {
             .addModule(new JavaTimeModule())
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
             .build();
+
+    private final ConcurrentHashMap<Path, Object> fileLocks = new ConcurrentHashMap<>();
 
     private final Path buildRoot;
     private final Path indexFile;
@@ -110,31 +113,43 @@ public class FileBuildRepository implements BuildRepository {
         }
     }
 
-    /**
-     * Write text by replacing the file atomically (best effort).
-     * Prevents partially written meta.json if the process crashes mid-write
-     * or if the meta.json is accessed mid-write.
-     */
+
+    private Object lockFor(Path path) {
+        return fileLocks.computeIfAbsent(path.toAbsolutePath().normalize(), p -> new Object());
+    }
+
     private void atomicWriteToFile(Path file, String content) {
+        /*
+        1. Create a temporary file
+        2. Get lock for temp file
+        3. Write to temp file
+        4. Atomically move/copy the content of the temp file to the actual file
+
+        Prevents partially written meta.json if the process crashes mid-write
+        or if the meta.json is accessed mid-write.
+         */
         Path tmp = file.resolveSibling(file.getFileName() + ".tmp");
 
-        try {
-            Files.writeString(
-                    tmp,
-                    content,
-                    StandardOpenOption.CREATE,
-                    StandardOpenOption.TRUNCATE_EXISTING
-            );
-            Files.move(tmp, file, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
-        } catch (AtomicMoveNotSupportedException e) {
-            // If atomic move doesn't work
+        Object lock = lockFor(file);
+        synchronized (lock) {
             try {
-                Files.move(tmp, file, StandardCopyOption.REPLACE_EXISTING);
-            } catch (IOException ex) {
-                throw new RuntimeException("Failed to write meta file: " + file, ex);
+                Files.writeString(
+                        tmp,
+                        content,
+                        StandardOpenOption.CREATE,
+                        StandardOpenOption.TRUNCATE_EXISTING
+                );
+                Files.move(tmp, file, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+            } catch (AtomicMoveNotSupportedException e) {
+                // If atomic move doesn't work
+                try {
+                    Files.move(tmp, file, StandardCopyOption.REPLACE_EXISTING);
+                } catch (IOException ex) {
+                    throw new RuntimeException("Failed to write meta file: " + file, ex);
+                }
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to write meta file: " + file, e);
             }
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to write meta file: " + file, e);
         }
     }
 
