@@ -12,8 +12,9 @@ import se.kth.dd2480.group15.domain.BuildSummary;
 import se.kth.dd2480.group15.infrastructure.entity.BuildMetaFile;
 import se.kth.dd2480.group15.domain.LogFile;
 
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -55,6 +56,7 @@ public class FileBuildRepository implements BuildRepository {
 
         try {
             Files.createDirectories(buildRoot); // Creates ~/dd2480-ci/builds if it doesn't already exist
+            Files.createFile(indexFile);
         } catch (IOException e) {
             throw new RuntimeException("Failed to create builds path directory: " + buildRoot, e);
         }
@@ -73,7 +75,7 @@ public class FileBuildRepository implements BuildRepository {
         Path metaPath = buildDir.resolve(META_FILE_NAME);
 
         BuildMetaFile metaFile = BuildMetaFile.from(build);
-        String metaJsonString = toJson(metaFile);
+        String metaJsonString = toJsonString(metaFile);
 
         boolean isNewBuild = tryCreateDirectory(buildDir);
         if (isNewBuild) {
@@ -83,7 +85,7 @@ public class FileBuildRepository implements BuildRepository {
                     build.getCreatedAt()
             );
             atomicWriteToFile(metaPath, metaJsonString);
-            appendLineToFile(indexFile, toJson(entry)); // Only append to index after metadata has been persisted
+            appendLineToFile(indexFile, toJsonString(entry)); // Only append to index after metadata has been persisted
         }
         else {
             atomicWriteToFile(metaPath, metaJsonString);
@@ -105,7 +107,7 @@ public class FileBuildRepository implements BuildRepository {
         }
     }
 
-    private String toJson(Object object) {
+    private String toJsonString(Object object) {
         try {
             return MAPPER.writeValueAsString(object);
         } catch (JsonProcessingException e) {
@@ -194,18 +196,88 @@ public class FileBuildRepository implements BuildRepository {
         }
     }
 
+    /**
+     * Retrieves a list of all build entries from the index file.
+     *
+     * @return a list of builds
+     */
     @Override
     public List<BuildSummary> listAll() {
-        return List.of();
+        List<BuildSummary> builds = new ArrayList<>();
+
+        try (BufferedReader reader = Files.newBufferedReader(indexFile)) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                BuildSummary entry = fromJsonString(line, BuildSummary.class);
+                builds.add(entry);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return builds;
     }
 
+    /**
+     * Retrieves a build instance by its unique identifier.
+     * <p>
+     * If the directory exists, it reads the metadata file, parses the metadata into
+     * a {@link Build} object, and returns it. If the directory does not exist, an
+     * empty {@link Optional} is returned. If an I/O error occurs when reading the
+     * file, an exception is thrown.
+     *
+     * @param buildId the unique identifier of the build to be retrieved
+     * @return an {@link Optional} containing the {@code Build} instance if found,
+     *         or an empty {@link Optional} if the build does not exist
+     * @throws RuntimeException if an error occurs while reading the metadata file
+     */
     @Override
     public Optional<Build> findById(UUID buildId) {
-        return Optional.empty();
+        Path buildDir = getBuildDirectory(buildId);
+        Path metaPath = buildDir.resolve(META_FILE_NAME);
+
+        // Check if the build exists
+        if (!Files.isDirectory(buildDir)) return Optional.empty();
+
+        try {
+            String jsonString = Files.readString(metaPath);
+            BuildMetaFile metaFile = fromJsonString(jsonString, BuildMetaFile.class);
+            return Optional.of(metaFile.toDomain());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
+    /**
+     * Retrieves the log file associated with a specified build ID.
+     * <p>
+     * If the log file exists, an {@link Optional} containing a {@link LogFile} object
+     * is returned. If there is no log or the directory does not exist, an empty
+     * {@link Optional} is returned. If an I/O error occurs while reading the log, a
+     * {@link RuntimeException} is thrown.
+     *
+     * @param buildId the unique identifier of the build whose log is being retrieved
+     * @return an {@link Optional} containing the {@link LogFile} if the log exists,
+     *         or an empty {@link Optional} if no log exists for the specified build ID
+     * @throws RuntimeException if an I/O error occurs when reading the log
+     */
     @Override
     public Optional<LogFile> getLog(UUID buildId) {
-        return Optional.empty();
+        Path buildDir = getBuildDirectory(buildId);
+        Path logPath = buildDir.resolve(LOG_FILE_NAME);
+
+        // Check if the build exists
+        if (!Files.isDirectory(buildDir)) return Optional.empty();
+
+        try (BufferedReader reader = Files.newBufferedReader(logPath)) {
+            StringBuilder sb = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
+            }
+            return Optional.of(new LogFile(sb.toString()));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
