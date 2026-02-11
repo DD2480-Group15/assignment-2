@@ -136,7 +136,26 @@ class ProcessRunnerTest {
         boolean result = runner.test(testJob, line -> logs.add(line));
 
         assertFalse(result);                                                // not a Maven project
-        assertTrue(logs.stream().anyMatch(line -> line.contains("Executing command: ./mvnw test")));  // verify test command was attempted logged
+        assertTrue(logs.stream().anyMatch(line -> line.contains("./mvnw test")));  // verify test command was attempted logged
+
+        runner.cleanup(testJob);
+    }
+
+    /**
+     * Verifies the maven compile command
+     */
+    @Test
+    void attemptCompileCommand() {
+        List<String> logs = new ArrayList<>();
+        File workspace = new File("workspace/" + testJob.getBuildId());
+        workspace.mkdirs();
+
+        // Execute the build method
+        boolean result = runner.build(testJob, line -> logs.add(line));
+
+        // Should be false, since no pom.xml, but we check if the command was initiated
+        assertFalse(result);
+        assertTrue(logs.stream().anyMatch(line -> line.contains("./mvnw compile")));
 
         runner.cleanup(testJob);
     }
