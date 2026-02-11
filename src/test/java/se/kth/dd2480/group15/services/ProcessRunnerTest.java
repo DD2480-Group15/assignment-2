@@ -118,7 +118,7 @@ class ProcessRunnerTest {
         
         assertFalse(testResult); // expected fail since "hello world"-repo does not have maven wrapper
 
-        boolean attemptedTestCommand = logs.stream().anyMatch(line -> line.contains("mvnw test"));
+        boolean attemptedTestCommand = logs.stream().anyMatch(line -> line.contains("./mvnw test"));
         
         assertTrue(attemptedTestCommand); // verifies we correctly log the execution string "mwnw test"
     }
@@ -136,7 +136,7 @@ class ProcessRunnerTest {
         boolean result = runner.test(testJob, line -> logs.add(line));
 
         assertFalse(result);                                                // not a Maven project
-        assertTrue(logs.stream().anyMatch(line -> line.contains("test")));  // verify test command was attempted logged
+        assertTrue(logs.stream().anyMatch(line -> line.contains("Executing command: ./mvnw test")));  // verify test command was attempted logged
 
         runner.cleanup(testJob);
     }
