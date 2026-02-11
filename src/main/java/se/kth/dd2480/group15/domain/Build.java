@@ -20,6 +20,7 @@ public class Build {
     private final String commitSha;
     private final String repoUrl;
     private final String repoOwner;
+    private final String repoName;
     private final Instant createdAt;
     private Instant startedAt;
     private Instant finishedAt;
@@ -32,8 +33,8 @@ public class Build {
      * @param repoUrl the URL of the repository containing the code
      * @return a new Build instance in QUEUED status
      */
-    public static Build newBuild(String commitSha, String repoUrl, String repoOwner) {
-        return new Build(UUID.randomUUID(), commitSha, repoUrl, repoOwner, Status.QUEUED, Instant.now(), null, null);
+    public static Build newBuild(String commitSha, String repoUrl, String repoOwner, String repoName) {
+        return new Build(UUID.randomUUID(), commitSha, repoUrl, repoOwner, repoName, Status.QUEUED, Instant.now(), null, null);
     }
 
     /**
@@ -54,11 +55,12 @@ public class Build {
             String commitSha,
             String repoUrl,
             String repoOwner,
+            String repoName,
             Status status,
             Instant createdAt,
             Instant startedAt,
             Instant finishedAt) {
-        return new Build(buildId, commitSha, repoUrl, repoOwner, status, createdAt, startedAt, finishedAt);
+        return new Build(buildId, commitSha, repoUrl, repoOwner, repoName, status, createdAt, startedAt, finishedAt);
     }
 
     private Build(
@@ -66,6 +68,7 @@ public class Build {
             String commitSha,
             String repoUrl,
             String repoOwner,
+            String repoName,
             Status status,
             Instant createdAt,
             Instant startedAt,
@@ -74,6 +77,7 @@ public class Build {
         this.commitSha = commitSha;
         this.repoUrl = repoUrl;
         this.repoOwner = repoOwner;
+        this.repoName = repoName;
         this.status = status;
         this.createdAt = createdAt;
         this.startedAt = startedAt;
@@ -91,6 +95,9 @@ public class Build {
 
     /** @return the owner of the repository */
     public String getRepoOwner() { return repoOwner; }
+
+    /** @return the name of the repository */
+    public String getRepoName() { return repoName; }
 
     /** @return the current status of the build */
     public Status getStatus() { return status; }

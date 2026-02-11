@@ -62,7 +62,8 @@ public class CIService {
         Build build = Build.newBuild(
             job.after(), 
             job.getRepository().clone_url(), 
-            job.getRepository().getOwner().getName()
+            job.getRepository().getOwner().getName(),
+            job.getRepository().getName()
         );
         queue.offer(build);
 

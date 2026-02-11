@@ -25,7 +25,8 @@ class ProcessRunnerTest {
         testJob = Build.newBuild(
             "7fd1a60b01f91b314f59955a4e4d4c80d8df11d3",       // real
             "https://github.com/octocat/Hello-World",           // real
-            "octocat"                                         // real
+            "octocat",                                         // real
+            "Hello-World"                                       // real
         );
     }
 
@@ -38,7 +39,7 @@ class ProcessRunnerTest {
         List<String> logs = new ArrayList<>();
         
         // Create a build with a URL that does not exist
-        Build invalidJob = Build.newBuild("commit-sha", "www.invalid-url.here", "owner");
+        Build invalidJob = Build.newBuild("commit-sha", "www.invalid-url.here", "owner", "name");
 
         // Try to clone the invalid repo
         boolean result = runner.cloneRepo(invalidJob, line -> logs.add(line));
@@ -59,7 +60,7 @@ class ProcessRunnerTest {
         
         // We use a real repo (githubs hello-world-repo) 
         // but a invalid commit-SHA to trigger a specific git behavior
-        Build invalidShaJob = Build.newBuild("invalid-sha", "https://github.com/octocat/Hello-World", "octocat");
+        Build invalidShaJob = Build.newBuild("invalid-sha", "https://github.com/octocat/Hello-World", "octocat", "name");
 
         runner.cloneRepo(invalidShaJob, line -> logs.add(line));
 
