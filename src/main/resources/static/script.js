@@ -16,8 +16,6 @@ async function fetchBuilds() {
             row.innerHTML = `
                 <td>#${build.buildId}</td>
                 <td><code>${build.commitSha}</code></td>
-                <td>${build.owner}</td>
-                <td class="status-${build.status.toLowerCase()}">${build.status}</td>
                 <td>${build.createdAt}</td>
                 <td><a href="${uniqueUrl}" class="view-btn">View Logs</a></td>`;
             listElement.appendChild(row);
