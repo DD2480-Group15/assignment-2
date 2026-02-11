@@ -105,6 +105,9 @@ public class ProcessRunner {
      */
     private boolean runProcess(ProcessBuilder pb, Consumer<String> onLog) {
         try {
+            // Log the command before starting so its captured (used in testing)
+            onLog.accept("Executing command: " + String.join(" ", pb.command()));
+            
             // Combine stdout and error stream to same place
             pb.redirectErrorStream(true); 
             Process process = pb.start();
