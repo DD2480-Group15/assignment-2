@@ -2,9 +2,7 @@ package se.kth.dd2480.group15.api.dto.response;
 
 /**
  * DTO representing the raw log output of a build.
- * 
- * @param logcontent    the text content from the standard build output
+ *
+ * @param logContent  the text content from the standard build output
  */
-public record BuildLogResponse (
-    String logContent
-) {}
+public record BuildLogResponse(String logContent) { }
