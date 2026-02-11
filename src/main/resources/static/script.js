@@ -2,8 +2,10 @@ async function fetchBuilds() {
     const listElement = document.getElementById('build-list');
     
     try {
-        const response = await fetch('mock-data.json');
-        const builds = await response.json();
+        const response = await fetch('/api/v1/builds');
+        const data = await response.json();
+
+        const builds = data.builds; //from BuildListResponse DTO
 
         listElement.innerHTML = ''; //in case we do some auto/live update 
 
