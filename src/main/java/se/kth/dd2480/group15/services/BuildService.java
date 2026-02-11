@@ -82,6 +82,6 @@ public class BuildService {
 
         if (log.isEmpty()) throw new BuildNotFoundException(buildId);
 
-        return new BuildLogResponse(log.toString());
+        return new BuildLogResponse(log.get().content());
     }
 }
