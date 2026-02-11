@@ -59,6 +59,7 @@ public class CIService {
      * @param job the incoming push request containing repository and commit information
      */
     public void queueJob(PushRequestDTO job) {
+        System.out.println("--- queueJob() started ---");
         Build build = Build.newBuild(
             job.after(), 
             job.getRepository().clone_url(), 
@@ -67,7 +68,13 @@ public class CIService {
         );
         queue.offer(build);
 
+        System.out.println("Build added to queue");
+
         buildRepository.save(build);
+
+        System.out.println("Meta data saved");
+
+        System.out.println("--- queueJob() done ---");
     }
 
     /**
@@ -78,8 +85,10 @@ public class CIService {
      * @param job the build job to process
      */
     public void handleJob(Build job) {
+        System.out.println("--- handleJob() started ---");
         job.startBuild();
         buildRepository.save(job);
+        System.out.println("Meta data created");
 
         boolean success;
         StringBuilder sb = new StringBuilder();
@@ -88,15 +97,21 @@ public class CIService {
         success = processRunner.cloneRepo(job, event -> buildRepository.appendToLog(job.getBuildId(), event));
         sb.append("Clone: ").append(success ? "Success" : "Fail").append("\n");
 
+        System.out.println("Cloning done, success: " + success);
+
         if (success) {
             // If clone success, build
             success = processRunner.build(job, event -> buildRepository.appendToLog(job.getBuildId(), event));
             sb.append("Build: ").append(success ? "Success" : "Fail").append("\n");
 
+            System.out.println("Compiling done, success: " + success);
+
             if (success) {
                 // If build success, test
                 success = processRunner.test(job, event -> buildRepository.appendToLog(job.getBuildId(), event));
                 sb.append("Test: ").append(success ? "Success" : "Fail").append("\n");
+
+                System.out.println("Testing done, success: " + success);
             }
         }
 
@@ -105,6 +120,8 @@ public class CIService {
 
         processRunner.cleanup(job);
 
+        System.out.println("Cleanup done");
+
         // Set build status and finish time
         if (success) { job.finishBuild(); }
         else { job.failBuild(); }
@@ -112,9 +129,15 @@ public class CIService {
         // Log meta data
         buildRepository.save(job);
 
+        System.out.println("Meta data updated");
+
         // Call Notifier
         String state = success ? "success" : "failure", description = sb.toString();
         notifierService.notify(job.getRepoOwner(), job.getRepoName(), job.getCommitSha(), state, description);
+
+        System.out.println("Notifier done");
+
+        System.out.println("--- handleJob() done ---");
     }
 
     /**
