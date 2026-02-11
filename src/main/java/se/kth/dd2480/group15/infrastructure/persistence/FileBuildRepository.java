@@ -8,7 +8,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.stereotype.Repository;
 import se.kth.dd2480.group15.domain.Build;
 import se.kth.dd2480.group15.infrastructure.config.StorageProperties;
-import se.kth.dd2480.group15.infrastructure.entity.BuildIndexEntry;
+import se.kth.dd2480.group15.domain.BuildSummary;
 import se.kth.dd2480.group15.infrastructure.entity.BuildMetaFile;
 import se.kth.dd2480.group15.domain.LogFile;
 
@@ -77,7 +77,7 @@ public class FileBuildRepository implements BuildRepository {
 
         boolean isNewBuild = tryCreateDirectory(buildDir);
         if (isNewBuild) {
-            BuildIndexEntry entry = new BuildIndexEntry(
+            BuildSummary entry = new BuildSummary(
                     build.getBuildId(),
                     build.getCommitSha(),
                     build.getCreatedAt()
@@ -113,6 +113,13 @@ public class FileBuildRepository implements BuildRepository {
         }
     }
 
+    private <T> T fromJsonString(String json, Class<T> c) {
+        try {
+            return MAPPER.readValue(json, c);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to deserialize build index entry into a build: " + json, e);
+        }
+    }
 
     private Object lockFor(Path path) {
         return fileLocks.computeIfAbsent(path.toAbsolutePath().normalize(), p -> new Object());
@@ -188,7 +195,7 @@ public class FileBuildRepository implements BuildRepository {
     }
 
     @Override
-    public List<Build> list(int limit, int offset) {
+    public List<BuildSummary> listAll() {
         return List.of();
     }
 
