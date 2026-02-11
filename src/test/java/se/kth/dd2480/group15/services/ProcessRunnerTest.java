@@ -23,11 +23,14 @@ class ProcessRunnerTest {
         
         // Creates a valid build object for the tests
         testJob = Build.newBuild(
-            "7fd1a60b01f91b314f59955a4e4d4c80d8df11d3",       // real
-            "https://github.com/octocat/Hello-World",           // real
-            "octocat",                                         // real
-            "Hello-World"                                       // real
+            "553c207",
+            "https://github.com/octocat/Hello-World",
+            "octocat",
+            "Hello-World"
         );
+
+        // cleanup before a test starts to avoid "folder already exists" errors
+        runner.cleanup(testJob);
     }
 
     /**
@@ -91,4 +94,70 @@ class ProcessRunnerTest {
         // The folder should be deleted now
         assertFalse(workspaceFolder.exists());
     }
+
+    /**
+     * Integration test, to verifying the full workflow:
+     * 1. Successful cloning of a repository
+     * 2. Attempt to execute the tests in the cloned workspace
+     */
+    @Test
+    void verifyCloneAndTest() {
+        List<String> logs = new ArrayList<>();
+        
+        // 1:
+        // Verify successful clone from e real repo (git hello world)
+        boolean cloneResult = runner.cloneRepo(testJob, line -> logs.add(line));
+        assertTrue(cloneResult);
+        
+        File workspace = new File("workspace/" + testJob.getBuildId());
+        assertTrue(workspace.exists()); // verify we have successfully cloned
+
+        // 2:
+        // Verify testing
+        boolean testResult = runner.test(testJob, line -> logs.add(line));
+        
+        assertFalse(testResult); // expected fail since "hello world"-repo does not have maven wrapper
+
+        boolean attemptedTestCommand = logs.stream().anyMatch(line -> line.contains("./mvnw test"));
+        
+        assertTrue(attemptedTestCommand); // verifies we correctly log the execution string "mwnw test"
+    }
+
+    /**
+     * Verifies the testing phase by specifically ensuring it handles 
+     * the commands executed correctly in a prepared workspace.
+     */
+    @Test
+    void attemptToRunTestsInWorkspace() {
+        List<String> logs = new ArrayList<>();
+        File workspace = new File("workspace/" + testJob.getBuildId());
+        workspace.mkdirs();
+
+        boolean result = runner.test(testJob, line -> logs.add(line));
+
+        assertFalse(result);                                                // not a Maven project
+        assertTrue(logs.stream().anyMatch(line -> line.contains("./mvnw test")));  // verify test command was attempted logged
+
+        runner.cleanup(testJob);
+    }
+
+    /**
+     * Verifies the maven compile command
+     */
+    @Test
+    void attemptCompileCommand() {
+        List<String> logs = new ArrayList<>();
+        File workspace = new File("workspace/" + testJob.getBuildId());
+        workspace.mkdirs();
+
+        // Execute the build method
+        boolean result = runner.build(testJob, line -> logs.add(line));
+
+        // Should be false, since no pom.xml, but we check if the command was initiated
+        assertFalse(result);
+        assertTrue(logs.stream().anyMatch(line -> line.contains("./mvnw compile")));
+
+        runner.cleanup(testJob);
+    }
+
 }
