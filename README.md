@@ -122,6 +122,12 @@ mvnw.cmd test
 
 ## Ways-of-working
 
-TODO
+We have established a solid way of working and as time has gone on and we have worked on two 
+assignments now we are adapting the ways quite naturally, so we deem that we have moved all 
+the way from “In use” to fulfilling most of the requirements of the “Working well” stage. What 
+we need to work on for next time is to continually fine-tune our practices and adapt it to the 
+next assignment in order to fully show that we are a well-integrated team. For example, we 
+have been using similar practices for both assignments, but next time we might want to see 
+if we can adapt our tools even further for the specific requirement of the next assignment.
 
 
