@@ -42,6 +42,9 @@ The maven wrapper is OS-dependent
 - For **Windows**: mvnw.cmd
 - For **Mac/Linux**: mvnw
 
+### Prerequisites
+* Java: JDK 21 or higher
+
 ## How to run the program
 ### .env file
 Add GITHUB_TOKEN= ghp_XXXXX (your own github PAT) to .env file
