@@ -7,6 +7,7 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 
 import io.github.cdimascio.dotenv.Dotenv;
+import se.kth.dd2480.group15.services.NotifierService;
 
 import java.io.FileWriter;
 import java.nio.file.Files;

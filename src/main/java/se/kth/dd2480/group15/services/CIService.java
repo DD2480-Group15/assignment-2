@@ -9,7 +9,6 @@ import jakarta.annotation.PreDestroy;
 
 import se.kth.dd2480.group15.api.dto.request.PushRequestDTO;
 import se.kth.dd2480.group15.domain.Build;
-import se.kth.dd2480.group15.application.services.NotifierService;
 import se.kth.dd2480.group15.infrastructure.persistence.BuildRepository;
 
 /**
@@ -42,7 +41,7 @@ public class CIService {
     /**
      * Creates a new CIService.
      * 
-     * @param processService service used to execute clone, build and test commands
+     * @param processRunner service used to execute clone, build and test commands
      * @param notifierService service used to notify external systems of build results
      * @param buildRepository repository used to persist build logs and state
      */

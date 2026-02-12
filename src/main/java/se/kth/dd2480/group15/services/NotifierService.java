@@ -1,4 +1,4 @@
-package se.kth.dd2480.group15.application.services;
+package se.kth.dd2480.group15.services;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.http.*;
